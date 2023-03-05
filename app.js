@@ -9,16 +9,21 @@ const connectDB = require("./db/connect");
 const cookieParser = require("cookie-parser");
 const Jobs = require("./models/Job");
 
-// error handler
+const swaggerUI = require("swagger-ui-express");
+const YAML = require("yamljs");
+const swaggerDocument = YAML.load("./swagger.yaml");
+
+// Error handlers
 const notFoundMiddleware = require("./errors/not-found");
 const errorHandlerMiddleware = require("./middleware/error-handler");
+// Auth Middleware
 const authMiddleware = require("./middleware/authentication");
 
+// Security packages
 const helmet = require("helmet");
 const cors = require("cors");
 const xss = require("xss-clean");
 const rateLimit = require("express-rate-limit");
-
 
 app.set("trust proxy", 1);
 app.use(
@@ -43,8 +48,11 @@ app.use("/domain/api/v1/auth", authRouter);
 
 // routes
 app.get("/", (req, res) => {
-  res.send("<h1>Jobs API</h1>");
+  res.send(`<h1>Jobs API</h1>
+ <a href="/api-docs">Documentation</a>`);
 });
+
+app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerDocument));
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);

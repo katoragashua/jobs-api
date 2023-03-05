@@ -22,8 +22,7 @@ const signup = async (req, res) => {
     const user = await User.create({ name, email, password });
     const token = await createToken(user._id, user.name);
     // res.cookie("user_token", token, { httpOnly: true, maxAge: maxAge });
-    res.status(StatusCodes.CREATED).json({ user, token });
-    console.log(user);
+    res.status(StatusCodes.CREATED).json({ user: {name: user.name, email: user.email}, token });
   
 };
 
@@ -40,10 +39,11 @@ const login = async (req, res) => {
     if (!auth) {
       throw new UnauthenticatedError("Please enter a valid password.");
     }
-    console.log(user); 
     // compare password
     const token = await createToken(user._id, user.name);
-    res.status(StatusCodes.OK).json({ user, token });
+    res
+      .status(StatusCodes.OK)
+      .json({ user: { name: user.name, email: user.email }, token });
 };
 
 module.exports = { signup, login };
